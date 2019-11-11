@@ -43,7 +43,26 @@ router.post('/:id', validateActionId, (req, res) => {
     }
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', validateActionId, (req, res) => {
+    const updatedAction = {...req.body, project_id: req.params.id};
+    const id = req.params.id;
+
+    if(!updatedAction.description && !updatedAction.notes){
+        res.status(400).json({
+            message: 'Please enter description or notes to update'
+        })
+    } else {
+    Actions.update(id, updatedAction)
+    .then(action => {
+        res.status(200).json(action)
+    })
+    .catch(err => {
+        res.status(500).json({
+            message: 'Error updating action',
+            err
+        })
+    })        
+    }
 
 });
 
