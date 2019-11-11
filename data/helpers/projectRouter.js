@@ -12,11 +12,15 @@ projectsRouter.get('/', (req, res) => {
             message: 'Error retrieving projects'
         })
     })
-})
+});
 
 projectsRouter.get('/:id', validateProjectId, (req, res) => {
     res.status(200).json(req.project);
-})
+});
+
+projectsRouter.post('/', validateProject, (req, res) => {
+    res.status(201).json(req.project)
+});
 
 function validateProjectId(req, res, next){
     const {id} = req.params;
@@ -38,6 +42,28 @@ function validateProjectId(req, res, next){
             err
         })
     })
+}
+
+function validateProject(req, res, next){
+    const projectInfo = req.body;
+
+    if(!projectInfo.name || !projectInfo.description){
+        res.status(400).json({
+            message: 'Please include a name and description for the project'
+        })
+    } else {
+        Projects.insert(projectInfo)
+        .then(project => {
+            req.project = project
+            next()
+        })
+        .catch(err => {
+            res.status(500).json({
+                message: 'Error adding project',
+                err
+            })
+        })
+    }
 }
 
 module.exports = projectsRouter;
