@@ -17,8 +17,8 @@ router.get('/', (req, res) => {
     })
 });
 
-router.get('/:id', (req, res) => {
-
+router.get('/:id', validateActionId, (req, res) => {
+    res.status(200).json(req.action)
 });
 
 router.post('/:id', (req, res) => {
@@ -33,6 +33,26 @@ router.delete('/:id', (req, res) => {
 
 });
 
-
+function validateActionId(req, res, next){
+    const id = req.params.id;
+    
+    Actions.get(id)
+    .then(action => {
+        if(action){
+            req.action = action;
+            next()
+        } else {
+            res.status(404).json({
+                message: 'ID does not exist'
+            })
+        }
+    })
+    .catch(err => {
+        res.status(500).json({
+            message: 'Error retrieving actions from id',
+            err
+        })
+    })
+};
 
 module.exports = router;
