@@ -66,8 +66,21 @@ router.put('/:id', validateActionId, (req, res) => {
 
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', validateActionId, (req, res) => {
+    const id = req.params.id;
 
+    Actions.remove(id)
+    .then(action => {
+        res.status(200).json({
+            message: 'Action removed'
+        })
+    })
+    .catch(err => {
+        res.status(500).json({
+            message: 'Error deleted action',
+            err
+        })
+    })
 });
 
 function validateActionId(req, res, next){
