@@ -29,21 +29,38 @@ projectsRouter.put('/:id', validateProjectId, (req, res) => {
         res.status(404).json({
             message: 'Please enter name or description to update'
         })
-    } else{
-    Projects.update(req.project.id, updated)
+    } else {
+        Projects.update(req.project.id, updated)
+        .then(project => {
+            if(project){
+                res.status(200).json(project);            
+            } 
+        })
+        .catch(err => {
+            res.status(500).json({
+                message: 'Error updating project',
+                err
+            })
+        })        
+    }
+});
+
+projectsRouter.delete('/:id', validateProjectId, (req, res) => {
+    const {id} = req.params;
+
+    Projects.remove(id)
     .then(project => {
-        if(project){
-        res.status(200).json(project);            
-        } 
+        res.status(200).json({
+            message: 'Project deleted',
+            project
+        })
     })
     .catch(err => {
         res.status(500).json({
-            message: 'Error updating project',
+            message: 'Error deleting project',
             err
         })
-    })        
-    }
-
+    })
 });
 
 function validateProjectId(req, res, next){
