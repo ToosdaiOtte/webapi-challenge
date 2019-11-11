@@ -22,6 +22,30 @@ projectsRouter.post('/', validateProject, (req, res) => {
     res.status(201).json(req.project)
 });
 
+projectsRouter.put('/:id', validateProjectId, (req, res) => {
+    const updated = req.body;
+    // const {id} = req.params;
+    if(!updated.name && !updated.description){
+        res.status(404).json({
+            message: 'Please enter name or description to update'
+        })
+    } else{
+    Projects.update(req.project.id, updated)
+    .then(project => {
+        if(project){
+        res.status(200).json(project);            
+        } 
+    })
+    .catch(err => {
+        res.status(500).json({
+            message: 'Error updating project',
+            err
+        })
+    })        
+    }
+
+});
+
 function validateProjectId(req, res, next){
     const {id} = req.params;
 
