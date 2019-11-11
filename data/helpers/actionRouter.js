@@ -1,6 +1,7 @@
 const express = require('express');
 
 const Actions = require('./actionModel.js');
+const Projects = require('./projectModel.js');
 
 const router = express.Router();
 
@@ -21,8 +22,25 @@ router.get('/:id', validateActionId, (req, res) => {
     res.status(200).json(req.action)
 });
 
-router.post('/:id', (req, res) => {
+router.post('/:id', validateActionId, (req, res) => {
+    const actionInfo = {...req.body, project_id: req.params.id};
 
+    if(!actionInfo.description || !actionInfo.notes){
+        res.status(400).json({
+            message: 'Please add description and notes'
+        })
+    } else {
+        Actions.insert(actionInfo)
+        .then(action => {
+            res.status(201).json(action)
+        })
+        .catch(err => {
+            res.status(500).json({
+                message: 'Error creating action',
+                err
+            })
+        })
+    }
 });
 
 router.put('/:id', (req, res) => {
